@@ -5,12 +5,33 @@ import {
 } from "@mui/icons-material";
 import { Avatar, Button, IconButton } from "@mui/material";
 import styled from "styled-components";
+import * as EmailValidator from 'email-validator';
+import { signOut } from "firebase/auth";
+import { auth, db } from "../firebase";
+import { useAuthState } from "react-firebase-hooks/auth";
+import { addDoc, collection } from "firebase/firestore";
 
 const Sidebar = () => {
+
+  const [user] = useAuthState(auth);
+
+  const createChat = () => {
+    const input = prompt("Please Enter Email address of the person you wish to chat with..")
+
+    if(!input) return;
+
+    if(EmailValidator.validate(input)) {
+      addDoc(collection(db, "chats"), {
+        users: [user?.email, input]
+      })
+    }
+
+  }
+
   return (
     <Container>
       <Header>
-        <UserAvatar />
+        <UserAvatar onClick={() => signOut(auth)} />
         {/* Side Icons */}
         <IconsContainer>
           <IconButton>
@@ -27,7 +48,7 @@ const Sidebar = () => {
         <SearchInput placeholder="Search in Chats" />
       </SearchBox>
       {/* Start chat button */}
-      <SidebarButton>Start a new chat</SidebarButton>
+      <SidebarButton onClick={() => createChat()}>Start a new chat</SidebarButton>
       {/* List chats */}
     </Container>
   );
@@ -73,6 +94,7 @@ const SearchInput = styled.input`
   outline-width: 0;
   border: none;
   flex: 1;
+  margin-left: 5px;
 `;
 
 const SidebarButton = styled(Button)`
