@@ -5,6 +5,7 @@ import { doc, setDoc, serverTimestamp } from "firebase/firestore";
 import Login from "./login";
 import Loader from "../components/Loading";
 import { useEffect } from "react";
+import { ToastProvider } from "../context/ToastContext";
 
 function MyApp({ Component, pageProps }) {
   const [user, loading, error] = useAuthState(auth);
@@ -26,7 +27,11 @@ function MyApp({ Component, pageProps }) {
 
   if (loading) return <Loader />;
   if (!user) return <Login />;
-  return <Component {...pageProps} />;
+  return (
+    <ToastProvider>
+      <Component {...pageProps} />
+    </ToastProvider>
+  );
 }
 
 export default MyApp;
